@@ -1,0 +1,120 @@
+body {
+    font-family: 'Open Sans', sans-serif;
+    height: 100%;
+    font-size: 16px;
+    line-height: 1.42857143;
+    color: #17171d;
+    background-color: #fff;
+    margin: 0;
+    display: block;
+    height: 100%;
+}
+
+header{
+  background-color: #000;
+}
+
+.app-title{
+  font-size: 32px;
+  color: #fff;
+  font-weight:bold;
+  padding-top: 10px;
+  padding-bottom:10px;
+  padding-left: 20px;
+}
+
+.App{
+  background: #fff;
+  display: flex;
+  flex: 1;
+  overflow: scroll;
+  flex-shrink: 0;
+  height: 800px;
+}
+
+.Message{
+  border: 1px solid rgba(23, 23, 29, 0.5) ;
+  width: 80%;
+  padding: 10px;
+  margin:20px;
+}
+
+.Message-not-saved{
+  color:#eee;
+}
+
+.Message-author{
+  font-weight: bold;
+}
+
+.Message-text{
+  margin-top:5px;
+}
+
+.ChannelList{
+  background-color: #6ed3cf;
+  width:300px;
+  display:flex;
+  height: 100%;
+  flex-direction: column;
+}
+
+.ChannelList-item{
+  background-color: #e1e8f0;
+  height:30px;
+  dislay: flex;
+  align-items: center;
+  padding-top:20px;
+  padding-bottom:20px;
+  padding-left: 20px;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.ChannelList-item-selected{
+  background-color: #6ed3cf;
+}
+
+.ChannelList-item:hover{
+  background-color: #6ed3cf;
+  cursor: pointer;
+}
+
+.ModalButton{
+  width: 100%;
+  background: #f86759;
+  color: #fff;
+  border: 0;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.ModalButton:hover{
+    cursor: pointer;
+  }
+
+.modal-title{
+  color: #17171d;
+  font-size: 18px;
+}
+
+.user{
+     width: auto;
+     background: #f86759;
+     color: #fff;
+     border: 0;
+     height: auto;
+     align-items: center;
+     justify-content: center;
+     text-transform: uppercase;
+     text-align: center;
+     margin-left:10px;
+}
+
+.username{
+  width: 40%;
+  height:20px;
+}

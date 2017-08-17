@@ -1,0 +1,46 @@
+.MessagePane{
+  background-color: #fff;
+  flex:1;
+  height:100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.MessagePane-List{
+  flex: 1;
+  overflow: auto;
+  padding-top:20px;
+}
+
+
+.MessagePane-Form-container{
+  background-color: #9068be;
+  padding: 20px;
+  display:flex;
+  flex:1;
+  flex-direction:column;
+  justify-content:space-between;
+}
+
+ .send {
+      width: 8%;
+  		background: #f86759;
+  		color: #fff;
+  		border: 0;
+  		height: 40px;
+      display:inline;
+  		align-items: center;
+  		justify-content: center;
+  		font-size: 14px;
+  		text-transform: uppercase;
+      text-align: center;
+      margin-left:20px;
+      cursor: pointer;
+}
+
+.message {
+    width: 50%;
+    height: 40px;
+    display: inline;
+    float:left;
+}
