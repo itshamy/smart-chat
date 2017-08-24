@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import {saveChannel} from '../storage.js';
+
 
 const Channel = ({name, isSelected, onClick}) => {
   const className = isSelected ? "ChannelList-item ChannelList-item-selected" : "ChannelList-item";
@@ -17,18 +19,20 @@ class ChannelList extends React.Component {
   this.onAddChannel = this.onAddChannel.bind(this);
   }
 
-  onAddChannel(){
+  onAddChannel(event){
     const name = window.prompt('New channel name');
     if(name !== null && name !== ""){
     const new_channel= {
-      id: this.props.channels.length + 1,
+      id: this.props.channels[this.props.channels.length - 1].id + 1,
       name
     };
+    saveChannel(new_channel);
     const channels = this.props.channels.push(new_channel);
     this.setState({ channels });
   } else { alert('No new channel was added.');
     }
 }
+
 
 render(channels, selectedChannelID, onSelect) {
     return (

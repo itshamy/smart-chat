@@ -3,7 +3,11 @@ import React from 'react';
 import MessagePane from './MessagePane';
 import ChannelList from './ChannelList';
 import Modal from 'react-modal';
+
+import { getMessages, getChannels, saveMessage, onNewMessage } from './storage.js';
+
 import './App.css';
+
 
 const customStyles = {
   content : {
@@ -18,54 +22,19 @@ const customStyles = {
   }
 };
 
-const messages = [
-  {
-    id: 1,
-    text: 'Hello there!',
-    author: 'Hamy',
-    channel_id: 1
-  },
-  {
-    id: 2,
-    text: 'How are you',
-    author: 'Minh',
-    channel_id: 1
-  },
-  {
-    id: 3,
-    text: 'Where did you go to in Vietnam?',
-    author: 'Terry',
-    channel_id: 2
-  },
-  {
-    id: 4,
-    text: 'I went to Saigon.',
-    author: 'James',
-    channel_id: 2
-  }
-];
-
-const channels = [
-  {id: 1, name: 'Fashion'},
-  {id: 2, name: 'Travel'},
-  {id: 3, name: 'Food'},
-];
-
-
 class App extends React.Component {
   constructor(){
     super();
 
     this.state={
-      messages,
-      channels,
-      selectedChannelID: channels[0].id,
+      messages:[],
+      channels:[],
+      selectedChannelID:null,
       author:'',
       modalIsOpen: false
     };
     this.onSendMessage = this.onSendMessage.bind(this);
     this.onChannelSelect = this.onChannelSelect.bind(this);
-    this.filteredMessages = this.filteredMessages.bind(this);
     this.openModal = this.openModal.bind(this);
     this.afterOpenModal = this.afterOpenModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
@@ -76,29 +45,40 @@ class App extends React.Component {
       this.setState({ author: event.target.value });
     }
 
-  onSendMessage(text, author){
-    const new_message = {
-      id: this.state.messages[this.state.messages.length-1].id + 1,
-      text,
-      author: this.state.author,
-      channel_id: this.state.selectedChannelID
-    };
 
-    const messages = [...this.state.messages, new_message];
-    this.setState({ messages });
-  }
+    onSendMessage(text) {
+      const new_message = {
+        id: this.state.messages.length + 1,
+        author: this.state.author,
+        text,
+        channel_id: this.state.selected_channel_id
+      };
+      saveMessage(new_message);
+      const messages = [...this.state.messages, new_message];
+      this.setState({messages});
+    }
 
-  onChannelSelect(id){
-    this.setState({selectedChannelID: id});
-  }
 
-  filteredMessages(){
-    return this.state.messages.filter(({channel_id}) => channel_id === this.state.selectedChannelID);
-  }
 
   componentDidMount(modal) {
     window.addEventListener('load', this.openModal);
+    getMessages().then(messages => this.setState({messages}));
+    getChannels().then(channels => this.setState({channels, selected_channel_id: channels[0].id}));
+    onNewMessage(new_message => {
+      const messages = [...this.state.messages, new_message];
+      this.setState({messages});
+    });
+}
+
+
+  onChannelSelect(id) {
+    this.setState({ selected_channel_id: id });
   }
+
+  filteredMessages() {
+    return this.state.messages.filter(({channel_id}) => channel_id === this.state.selected_channel_id);
+  }
+
 
   openModal() {
     this.setState({modalIsOpen: true});
@@ -119,9 +99,9 @@ class App extends React.Component {
     return (
       <div className="App">
         <ChannelList
-          channels={this.state.channels}
-          selectedChannelID={this.state.selectedChannelID}
-          onSelect={this.onChannelSelect}
+         channels={this.state.channels}
+         selectedChannelId={this.state.selected_channel_id}
+         onSelect={this.onChannelSelect}
         />
         <MessagePane messages={this.filteredMessages()} onSendMessage={this.onSendMessage}/>
         <Modal
@@ -136,7 +116,7 @@ class App extends React.Component {
           <h2 className="modal-title">Enter your name to start chatting</h2>
           <form>
             <input
-            className="username"
+            className="author"
             type="text"
             value={this.state.author}
             onChange={this.onAddAuthor} />

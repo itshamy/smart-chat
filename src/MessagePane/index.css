@@ -7,6 +7,7 @@
 }
 
 .MessagePane-List{
+  list-style: none;
   flex: 1;
   overflow: auto;
   padding-top:20px;
@@ -15,7 +16,9 @@
 
 .MessagePane-Form-container{
   background-color: #9068be;
-  padding: 20px;
+  padding-top: 30px;
+  padding-bottom: 30px;
+  padding-left: 20px;
   display:flex;
   flex:1;
   flex-direction:column;
