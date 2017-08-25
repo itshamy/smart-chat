@@ -1,5 +1,6 @@
 
 import React from 'react';
+import cookie from "react-cookie";
 import MessagePane from './MessagePane';
 import ChannelList from './ChannelList';
 import Modal from 'react-modal';
@@ -31,7 +32,8 @@ class App extends React.Component {
       channels:[],
       selectedChannelID:null,
       author:'',
-      modalIsOpen: false
+      modalIsOpen: false,
+      cookie:''
     };
     this.onSendMessage = this.onSendMessage.bind(this);
     this.onChannelSelect = this.onChannelSelect.bind(this);
@@ -39,12 +41,17 @@ class App extends React.Component {
     this.afterOpenModal = this.afterOpenModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.onAddAuthor = this.onAddAuthor.bind(this);
+    this.handleOnLogIn = this.handleOnLogIn.bind(this);
     }
 
     onAddAuthor(event) {
       this.setState({ author: event.target.value });
     }
 
+    handleOnLogIn(){
+       cookie.save("author", true, {path: "/"});
+       this.setState({cookie: this.state.author})
+     };
 
     onSendMessage(text) {
       const new_message = {
@@ -57,7 +64,6 @@ class App extends React.Component {
       const messages = [...this.state.messages, new_message];
       this.setState({messages});
     }
-
 
 
   componentDidMount(modal) {
@@ -120,7 +126,7 @@ class App extends React.Component {
             type="text"
             value={this.state.author}
             onChange={this.onAddAuthor} />
-            <button className="user" onClick={this.closeModal} >Enter</button>
+            <button className="user" onClick={this.closeModal} onSubmit={this.handleOnLogIn}>Enter</button>
           </form>
         </Modal>
       </div>
