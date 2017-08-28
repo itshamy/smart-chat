@@ -103,6 +103,7 @@ header{
 }
 
 .user{
+  cursor: pointer;
      width: auto;
      background: #f86759;
      color: #fff;

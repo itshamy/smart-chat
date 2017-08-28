@@ -1,15 +1,15 @@
 
 import React from 'react';
-import cookie from "react-cookie";
 import MessagePane from './MessagePane';
 import ChannelList from './ChannelList';
 import Modal from 'react-modal';
+import Cookies from 'universal-cookie';
 
 import { getMessages, getChannels, saveMessage, onNewMessage } from './storage.js';
 
 import './App.css';
 
-
+const cookies = new Cookies();
 const customStyles = {
   content : {
     top                   : '50%',
@@ -24,34 +24,28 @@ const customStyles = {
 };
 
 class App extends React.Component {
-  constructor(){
-    super();
+  constructor(props){
+    super(props);
 
     this.state={
       messages:[],
       channels:[],
       selectedChannelID:null,
       author:'',
-      modalIsOpen: false,
-      cookie:''
+      modalIsOpen: false
     };
     this.onSendMessage = this.onSendMessage.bind(this);
     this.onChannelSelect = this.onChannelSelect.bind(this);
     this.openModal = this.openModal.bind(this);
-    this.afterOpenModal = this.afterOpenModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.onAddAuthor = this.onAddAuthor.bind(this);
-    this.handleOnLogIn = this.handleOnLogIn.bind(this);
     }
 
     onAddAuthor(event) {
       this.setState({ author: event.target.value });
+      cookies.set('author', { path: '/' });
+      console.log(cookies.get('author')); 
     }
-
-    handleOnLogIn(){
-       cookie.save("author", true, {path: "/"});
-       this.setState({cookie: this.state.author})
-     };
 
     onSendMessage(text) {
       const new_message = {
@@ -65,41 +59,39 @@ class App extends React.Component {
       this.setState({messages});
     }
 
-
-  componentDidMount(modal) {
-    window.addEventListener('load', this.openModal);
-    getMessages().then(messages => this.setState({messages}));
-    getChannels().then(channels => this.setState({channels, selected_channel_id: channels[0].id}));
-    onNewMessage(new_message => {
-      const messages = [...this.state.messages, new_message];
-      this.setState({messages});
-    });
-}
-
-
-  onChannelSelect(id) {
-    this.setState({ selected_channel_id: id });
-  }
-
-  filteredMessages() {
-    return this.state.messages.filter(({channel_id}) => channel_id === this.state.selected_channel_id);
+    componentDidMount(modal) {
+      window.addEventListener('load', this.openModal);
+      getMessages().then(messages => this.setState({messages}));
+      getChannels().then(channels => this.setState({channels, selected_channel_id: channels[0].id}));
+      onNewMessage(new_message => {
+        const messages = [...this.state.messages, new_message];
+        this.setState({messages});
+      });
   }
 
 
-  openModal() {
-    this.setState({modalIsOpen: true});
-  }
+    onChannelSelect(id) {
+      this.setState({ selected_channel_id: id });
+    }
 
-  afterOpenModal() {
-  }
+    filteredMessages() {
+      return this.state.messages.filter(({channel_id}) => channel_id === this.state.selected_channel_id);
+    }
+
+
+    openModal() {
+      this.setState({modalIsOpen: true});
+    }
+
 
   closeModal() {
     if(this.state.author){
     this.setState({modalIsOpen: false});
   } else {
     this.setState({modalIsOpen: true});
+    alert("You must enter your name first!");
   }
-  }
+}
 
   render(){
     return (
@@ -111,10 +103,8 @@ class App extends React.Component {
         />
         <MessagePane messages={this.filteredMessages()} onSendMessage={this.onSendMessage}/>
         <Modal
-          onSend={this.onAddUser}
           openModal={this.openModal}
           isOpen={this.state.modalIsOpen}
-          onAfterOpen={this.afterOpenModal}
           onRequestClose={this.closeModal}
           style={customStyles}
           contentLabel="User Modal"
@@ -126,11 +116,12 @@ class App extends React.Component {
             type="text"
             value={this.state.author}
             onChange={this.onAddAuthor} />
-            <button className="user" onClick={this.closeModal} onSubmit={this.handleOnLogIn}>Enter</button>
+            <button className="user" onClick={this.closeModal}>Enter</button>
           </form>
         </Modal>
       </div>
   );
   }
 }
-export default App
+
+export default App;
