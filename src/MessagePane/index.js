@@ -1,5 +1,6 @@
 import React from 'react';
 import Form from './Form';
+import Scroll from './scroll.js';
 import './index.css';
 import PropTypes from 'prop-types';
 
@@ -13,6 +14,7 @@ const Message = ({author, text}) => (
 const List = ({messages}) => (
   <div className="MessagePane-List">
     {messages.map(({id, author, text}) => <Message key={id} author={author} text={text} />)}
+    <Scroll />
   </div>
 );
 
