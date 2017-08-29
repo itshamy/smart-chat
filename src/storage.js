@@ -37,7 +37,7 @@ export function saveChannel(channel) {
 }
 
 export function onNewChannel(callback, delay = false) {
-  firebase.database().ref('channes').on('child_added', (data) => {
+  firebase.database().ref('channels').on('child_added', (data) => {
     if (!initial_data_loaded) return;
     if (delay) {
       setTimeout(() => callback(data.val()), 3000);

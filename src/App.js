@@ -1,11 +1,11 @@
-
 import React from 'react';
 import MessagePane from './MessagePane';
 import ChannelList from './ChannelList';
 import Modal from 'react-modal';
 import Cookies from 'universal-cookie';
+import PropTypes from 'prop-types';
 
-import { getMessages, getChannels, saveMessage, onNewMessage } from './storage.js';
+import { getMessages, getChannels, saveMessage, onNewMessage} from './storage.js';
 
 import './App.css';
 
@@ -38,16 +38,23 @@ class App extends React.Component {
     this.onChannelSelect = this.onChannelSelect.bind(this);
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
+    this.onChangeAuthor = this.onChangeAuthor.bind(this);
     this.onAddAuthor = this.onAddAuthor.bind(this);
     }
 
-    onAddAuthor(event) {
-      this.setState({ author: event.target.value });
-      cookies.set('author', { path: '/' });
-      console.log(cookies.get('author')); 
+    onAddAuthor(event){
+      const {author} = this.state;
+      this.props.onAdd(author);
+      cookies.set("author", author);
+      console.log(cookies.get("author", author));
+      this.setState({author, modalIsOpen: false});
     }
 
-    onSendMessage(text) {
+    onChangeAuthor(event) {
+      this.setState({ author: event.target.value });
+    }
+
+    onSendMessage(text, author) {
       const new_message = {
         id: this.state.messages.length + 1,
         author: this.state.author,
@@ -85,13 +92,9 @@ class App extends React.Component {
 
 
   closeModal() {
-    if(this.state.author){
     this.setState({modalIsOpen: false});
-  } else {
-    this.setState({modalIsOpen: true});
-    alert("You must enter your name first!");
   }
-}
+
 
   render(){
     return (
@@ -104,8 +107,10 @@ class App extends React.Component {
         <MessagePane messages={this.filteredMessages()} onSendMessage={this.onSendMessage}/>
         <Modal
           openModal={this.openModal}
+          onAdd={this.onAddAuthor}
           isOpen={this.state.modalIsOpen}
           onRequestClose={this.closeModal}
+          shouldCloseOnOverlayClick={false}
           style={customStyles}
           contentLabel="User Modal"
         >
@@ -115,13 +120,21 @@ class App extends React.Component {
             className="author"
             type="text"
             value={this.state.author}
-            onChange={this.onAddAuthor} />
-            <button className="user" onClick={this.closeModal}>Enter</button>
+            onChange={this.onChangeAuthor} />
+            <button className="user" onClick={this.onAddAuthor}>Enter Smartchat</button>
           </form>
         </Modal>
       </div>
   );
   }
+}
+
+App.propTypes = {
+  onAdd: PropTypes.func.isRequired
+};
+
+App.defaultProps = {
+  onAdd: () => {}
 }
 
 export default App;
