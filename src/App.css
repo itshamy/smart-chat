@@ -120,3 +120,8 @@ header{
   width: 40%;
   height:20px;
 }
+
+.error{
+  color: red;
+  font-size:12px;
+}

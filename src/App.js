@@ -1,6 +1,7 @@
 import React from 'react';
 import MessagePane from './MessagePane';
 import ChannelList from './ChannelList';
+import Error from './error.js';
 import Modal from 'react-modal';
 import Cookies from 'universal-cookie';
 import PropTypes from 'prop-types';
@@ -32,7 +33,8 @@ class App extends React.Component {
       channels:[],
       selectedChannelID:null,
       author:'',
-      modalIsOpen: false
+      modalIsOpen: false,
+      showError: false
     };
     this.onSendMessage = this.onSendMessage.bind(this);
     this.onChannelSelect = this.onChannelSelect.bind(this);
@@ -42,13 +44,26 @@ class App extends React.Component {
     this.onAddAuthor = this.onAddAuthor.bind(this);
     }
 
+    openModal() {
+      this.setState({modalIsOpen: true});
+    }
+
+    closeModal() {
+      this.setState({modalIsOpen: false});
+    }
+
     onAddAuthor(event){
+      event.preventDefault();
       const {author} = this.state;
       this.props.onAdd(author);
       cookies.set("author", author);
       console.log(cookies.get("author", author));
+      if(author.length <= 0){
+        this.setState({author, modalIsOpen: true, showError: true});
+      }else{
       this.setState({author, modalIsOpen: false});
     }
+  }
 
     onChangeAuthor(event) {
       this.setState({ author: event.target.value });
@@ -74,8 +89,7 @@ class App extends React.Component {
         const messages = [...this.state.messages, new_message];
         this.setState({messages});
       });
-  }
-
+    }
 
     onChannelSelect(id) {
       this.setState({ selected_channel_id: id });
@@ -84,17 +98,6 @@ class App extends React.Component {
     filteredMessages() {
       return this.state.messages.filter(({channel_id}) => channel_id === this.state.selected_channel_id);
     }
-
-
-    openModal() {
-      this.setState({modalIsOpen: true});
-    }
-
-
-  closeModal() {
-    this.setState({modalIsOpen: false});
-  }
-
 
   render(){
     return (
@@ -116,12 +119,13 @@ class App extends React.Component {
         >
           <h2 className="modal-title">Enter your name to start chatting</h2>
           <form>
+            { this.state.showError ? <Error /> : null }
             <input
             className="author"
             type="text"
             value={this.state.author}
             onChange={this.onChangeAuthor} />
-            <button className="user" onClick={this.onAddAuthor}>Enter Smartchat</button>
+            <button className="user" onClick={this.onAddAuthor}>Start Chatting</button>
           </form>
         </Modal>
       </div>
