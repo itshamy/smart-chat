@@ -1,16 +1,21 @@
 .MessagePane{
   background-color: #fff;
-  flex:1;
   height:100%;
   display: flex;
   flex-direction: column;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 0;
 }
 
 .MessagePane-List{
   list-style: none;
   flex: 1;
   overflow: auto;
-  padding-top:20px;
+  margin-top: 50px;
 }
 
 
@@ -19,14 +24,14 @@
   padding-top: 30px;
   padding-bottom: 30px;
   padding-left: 20px;
-  display:flex;
+  display:fixed;
   flex:1;
   flex-direction:column;
   justify-content:space-between;
 }
 
  .send {
-      width: 8%;
+      width: auto;
   		background: #f86759;
   		color: #fff;
   		border: 0;
@@ -37,7 +42,10 @@
   		font-size: 14px;
   		text-transform: uppercase;
       text-align: center;
+      margin-top:5px;
       margin-left:20px;
+      padding-left:20px;
+      padding-right:20px;
       cursor: pointer;
 }
 
