@@ -163,7 +163,7 @@ render(){
             onSetOpen={this.onSetSidebarOpen}
             >
             <span/><span/>
-            <h2 className="title">{!this.state.docked && <a onClick={this.openSidebar} href="#"><Nav/></a>}</h2>
+            <h2 className="name">{!this.state.docked && <a onClick={this.openSidebar} href="#"><Nav/></a>}Home</h2>
         </Sidebar>
         <Modal
             openModal={this.openModal}
