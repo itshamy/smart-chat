@@ -9,6 +9,7 @@
   bottom: 0;
   left: 0;
   z-index: 0;
+  margin-left: 300px;
 }
 
 .MessagePane-List{
@@ -54,4 +55,10 @@
     height: 40px;
     display: inline;
     float:left;
+}
+
+@media screen and (max-width: 800px) {
+  .MessagePane{
+    margin-left: 0px;
+  }
 }

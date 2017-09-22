@@ -1,70 +1,53 @@
 import React from 'react';
 import MessagePane from './MessagePane';
-import ChannelList from './ChannelList';
 import Error from './error.js';
-import Intro from './MessagePane/intro.js';
+import Intro from './intro.js';
 import Modal from 'react-modal';
 import Cookies from 'universal-cookie';
 import PropTypes from 'prop-types';
 import Sidebar from 'react-sidebar';
+import customStyles from './modalStyle.js';
 import Nav from './nav.js';
+import NotFound from './404.js';
 import { getMessages, getChannels, saveMessage, onNewMessage} from './storage.js';
 import './App.css';
+import { BrowserRouter as Router, Route, Switch} from 'react-router-dom';
+import ChannelList from './ChannelList';
 
 const cookies = new Cookies();
 const mql = window.matchMedia(`(min-width: 800px)`);
 const sidebarStyles = {
     sidebar: {
-        zIndex: '2',
+        zIndex: '4',
         backgroundColor: 'rgb(225, 232, 240)',
         width: '300px',
         overflow: 'inherit'
+    },
+    overlay: {
+   zIndex: '3'
     }
 }
-const customStyles = {
-  overlay : {
-    position          : 'fixed',
-    top               : 0,
-    left              : 0,
-    right             : 0,
-    bottom            : 0,
-    backgroundColor   : 'rgba(47, 52, 61, 1)',
-    flex              :'3',
-    zIndex            : '4'
-  },
-  content : {
-    top                   : '50%',
-    left                  : '50%',
-    right                 : 'auto',
-    bottom                : 'auto',
-    marginRight           : '-50%',
-    transform             : 'translate(-50%, -50%)',
-    maxWidth              : '400px',
-    maxHeight             : '400px',
-    width                 : '60%',
-    padding               : '30px'
-  }
-};
-
+const channelName = window.location.pathname.split('/')[2];
+const getID = (channels, channel) => {
+  for (var key in channels) {
+     if (channels[key].name === channel){
+       return channels[key].id;
+     }}};
 class App extends React.Component {
   constructor(props){
     super(props);
 
     this.state={
-      messages:[],
       channels:[],
-      selectedChannelID:null,
+      messages:[],
       author:'',
       modalIsOpen: false,
       showError: false,
-      showIntro: true,
-      showMessages: false,
       mql: mql,
       docked: false,
       open: false
     };
     this.onSendMessage = this.onSendMessage.bind(this);
-    this.onChannelSelect = this.onChannelSelect.bind(this);
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.onChangeAuthor = this.onChangeAuthor.bind(this);
@@ -72,6 +55,7 @@ class App extends React.Component {
     this.mediaQueryChanged = this.mediaQueryChanged.bind(this);
     this.onSetSidebarOpen = this.onSetSidebarOpen.bind(this);
     this.openSidebar = this.openSidebar.bind(this);
+    this.onChannelSelect = this.onChannelSelect.bind(this);
     }
 
     onSetSidebarOpen(open) {
@@ -96,12 +80,10 @@ class App extends React.Component {
 
     openSidebar(event) {
       this.setState({open: !this.state.open});
-
-    if (event) {
-      event.preventDefault();
-    }
-      console.log("hambuger clicked");
-   }
+        if (event) {
+          event.preventDefault();
+        } console.log("hambuger clicked");
+      }
 
     openModal() {
       this.setState({modalIsOpen: true});
@@ -128,94 +110,130 @@ class App extends React.Component {
       this.setState({ author: event.target.value });
     }
 
-    onSendMessage(text, author) {
-      const new_message = {
-        id: this.state.messages.length + 1,
-        author: this.state.author,
-        text,
-        channel_id: this.state.selected_channel_id
-      };
-      saveMessage(new_message);
-      const messages = [...this.state.messages, new_message];
-      this.setState({messages});
-    }
-
     componentDidMount(modal) {
       window.addEventListener('load', this.openModal);
       getMessages().then(messages => this.setState({messages}));
-      getChannels().then(channels => this.setState({channels, selected_channel_id: channels[0].id, title:''}));
+      getChannels().then(channels => this.setState({channels}));
       onNewMessage(new_message => {
         const messages = [...this.state.messages, new_message];
         this.setState({messages});
       });
     }
 
-    onChannelSelect(id) {
-      let title = this.state.channels[id - 1].name;
-      this.setState({ selected_channel_id: id, showIntro: false, showMessages: true, title, open: !this.state.open});
-      console.log(title);
+      onSendMessage(text, author) {
+        const loadId = getID(this.state.channels, channelName);
+        if (this.state.selected_channel_id !== undefined){
+        const new_message = {
+          id: this.state.messages.length + 1,
+          author: this.state.author,
+          text,
+          channel_id: this.state.selected_channel_id
+        };
+        saveMessage(new_message);
+        const messages = [...this.state.messages, new_message];
+        this.setState({messages});
+      } else if (this.state.selected_channel_id === undefined){
+        const new_message = {
+          id: this.state.messages.length + 1,
+          author: this.state.author,
+          text,
+          channel_id: loadId
+        };
+        saveMessage(new_message);
+        const messages = [...this.state.messages, new_message];
+        this.setState({messages});
+      }
     }
 
-    filteredMessages() {
-      return this.state.messages.filter(({channel_id}) => channel_id === this.state.selected_channel_id);
-    }
+      onChannelSelect(id) {
+        this.setState({selected_channel_id: id, open: !this.state.open});
+      }
 
-  render(){
-    var sidebar = <ChannelList
-     channels={this.state.channels}
-     selectedChannelId={this.state.selected_channel_id}
-     onSelect={this.onChannelSelect}
-    />;
-    var sidebarProps = {
-      sidebar: sidebar,
-      docked: this.state.docked,
-      open: this.state.open,
-      onSetOpen: this.onSetOpen,
-    };
+render(){
     return (
       <div className="App">
-      <Sidebar styles={sidebarStyles}
-      sidebar={sidebar}
-              open={this.state.open}
-              docked={this.state.docked}
-              onSetOpen={this.onSetSidebarOpen}>
-        { this.state.showIntro ? <div><h2 className="title">{!this.state.docked && <a onClick={this.openSidebar} href="#"><Nav/></a>}Home</h2><Intro/></div> : null }
-        { this.state.showMessages ? <div className="Title">
-        <h2 className="name">{!this.state.docked && <a onClick={this.openSidebar} href="#"><Nav/></a>}{this.state.title}</h2>
-        <MessagePane messages={this.filteredMessages()} onSendMessage={this.onSendMessage}/>
-        </div> : null }
-        <Modal
-          openModal={this.openModal}
-          onAdd={this.onAddAuthor}
-          isOpen={this.state.modalIsOpen}
-          onRequestClose={this.closeModal}
-          shouldCloseOnOverlayClick={false}
-          style={customStyles}
-          contentLabel="User Modal"
-        >
-          <form>
-            <img className="logo" alt="overlay logo" src={require('./images/smart.png')}/>
-            { this.state.showError ? <Error /> : null }
-            <input
-            className="author"
-            placeholder="Enter your name to chat"
-            type="text"
-            value={this.state.author}
-            onChange={this.onChangeAuthor} />
-            <button className="user" onClick={this.onAddAuthor}>Start Chatting</button>
-          </form>
-        </Modal>
+      <Router>
+      <div>
+        <Sidebar
+            styles={sidebarStyles}
+            sidebar={<ChannelList channels={this.state.channels} onSelect={this.onChannelSelect}/>
+                  }
+            open={this.state.open}
+            docked={this.state.docked}
+            onSetOpen={this.onSetSidebarOpen}
+            >
+            <span/><span/>
+            <h2 className="title">{!this.state.docked && <a onClick={this.openSidebar} href="#"><Nav/></a>}</h2>
         </Sidebar>
+        <Modal
+            openModal={this.openModal}
+            onAdd={this.onAddAuthor}
+            isOpen={this.state.modalIsOpen}
+            onRequestClose={this.closeModal}
+            shouldCloseOnOverlayClick={false}
+            style={customStyles}
+            contentLabel="User Modal"
+          >
+            <form>
+              <img className="logo" alt="overlay logo" src={require('./images/smart.png')}/>
+              { this.state.showError ? <Error /> : null }
+              <input
+              className="author"
+              placeholder="Enter your name to chat"
+              type="text"
+              value={this.state.author}
+              onChange={this.onChangeAuthor} />
+              <button className="user" onClick={this.onAddAuthor}>Start Chatting</button>
+            </form>
+        </Modal>
+          <Switch>
+          <Route exact path="/" component={Intro} />
+          <Route path="/channels/:name"
+    	       render={(props, key) => {
+               const channel = props.match.url.split('/')[2];
+               const names = this.state.channels.map(({name}) => name);
+               const hasName = (names, value) => {
+                 for(var id in names) {
+                    if(names[id] === value) {
+                      return true;
+                    }}};
+               const getID = (channels, channel) => {
+                 for (var key in channels) {
+                    if (channels[key].name === channel){
+                      return channels[key].id;
+                    }}};
+               const id = getID(this.state.channels, channel);
+               const messages = this.state.messages.filter(({channel_id}) => channel_id === id);
+                  return(
+                       hasName(names, channel)
+                        ?
+                        <div>
+                     <h2 className="name">{!this.state.docked && <a onClick={this.openSidebar} href="#"><Nav/></a>}{channel}</h2>
+                        <MessagePane
+                            messages={messages}
+                            onSendMessage={this.onSendMessage}/>
+                        </div>
+                        : <NotFound/>
+                      )
+            }}
+          />
+          <Route path="*" component={NotFound} />
+          </Switch>
+        </div>
+        </Router>
       </div>
   );
   }
 }
 App.propTypes = {
-  onAdd: PropTypes.func.isRequired
+  onAdd: PropTypes.func.isRequired,
+  channels: PropTypes.array.isRequired
 };
 
 App.defaultProps = {
-  onAdd: () => {}
+  onAdd: () => {},
+  channels: []
+
 }
 
 export default App;

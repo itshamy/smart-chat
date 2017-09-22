@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "firebase": "^4.2.0",
+    "history": "^4.7.2",
     "prop-types": "^15.5.10",
     "react": "^15.6.1",
     "react-burger-menu": "^2.1.5",

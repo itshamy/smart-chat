@@ -2,11 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {saveChannel} from '../storage.js';
 import Footer from './footer.js';
+import { NavLink } from 'react-router-dom';
 
-const Channel = ({name, isSelected, onClick}) => {
-  const className = isSelected ? "ChannelList-item-selected" : "ChannelList-item";
+const Channel = ({name, onClick}) => {
   return (
-    <div onClick={onClick} className={className}>{name}</div>
+  <div onClick={onClick} className="ChannelList-item">#{name}</div>
   );
 };
 
@@ -35,16 +35,23 @@ class ChannelList extends React.Component {
 }
 
 
-render(channels, selectedChannelID, onSelect) {
+render(channels, onSelect, selected_channel_id) {
     return (
       <div className="ChannelList">
         {<button className="ModalButton" onClick={this.onAddChannel}>Add new channel</button>}
         {<div className="space"></div>}
         {
         this.props.channels.map(({id, name}) => {
-        const is_selected = selectedChannelID === id;
         const onChannelSelect = () => this.props.onSelect(id);
-          return <Channel key={id} name={name} isSelected={is_selected} onClick={onChannelSelect}/>
+          return <NavLink
+          activeStyle={{
+          fontWeight: '400',
+          color: 'rgb(0, 0, 0)'
+          }}
+          key={id}
+          exact to={`/channels/${name}`}>
+          <Channel key={id} name={name} onClick={onChannelSelect}/>
+          </NavLink>
         })
       }
       {<div className="space"></div>}
