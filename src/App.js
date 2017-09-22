@@ -163,7 +163,6 @@ render(){
             onSetOpen={this.onSetSidebarOpen}
             >
             <span/><span/>
-            <h2 className="name">{!this.state.docked && <a onClick={this.openSidebar} href="#"><Nav/></a>}Home</h2>
         </Sidebar>
         <Modal
             openModal={this.openModal}
@@ -187,7 +186,15 @@ render(){
             </form>
         </Modal>
           <Switch>
-          <Route exact path="/" component={Intro} />
+          <Route exact path="/" render={() => {
+            return (
+              <div>
+              <h2 className="name">{!this.state.docked && <a onClick={this.openSidebar} href="#"><Nav/></a>}Home</h2>
+              <Intro/>
+              </div>
+            )
+          }}
+          />
           <Route path="/channels/:name"
     	       render={(props, key) => {
                const channel = props.match.url.split('/')[2];

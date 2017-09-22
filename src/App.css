@@ -245,29 +245,6 @@ p{
    display: inline;
  }
 
-.title{
-width: 100%;
-position: fixed;
-top: 0;
-display: block;
-background: #9068be;
-color: #fff;
-border: 0;
-height: 30px;
-align-items: center;
-justify-content: center;
-font-size: 14px;
-text-transform: uppercase;
-font-weight:500;
--webkit-margin-before: 0;
--webkit-border-after: 0;
-  z-index: 3;
-}
-
-h2.title{
-  padding: 10px 0 0 20px;
-}
-
 
 .content{
   padding: 0 10px 20px 20px;
@@ -284,10 +261,6 @@ h2.title{
 link{
   color: #565867!important;
   display: block!important;
-}
-
-.Title{
-    z-index: 1;
 }
 
 .navIcon {
